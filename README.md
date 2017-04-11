@@ -20,7 +20,4 @@ graph TD
 		from: Point<br/>
 		to: Point
 	"]
-
-	Delivery --- User
-	Delivery --- Driver
 ```

@@ -31,14 +31,8 @@ class Driver(models.Model):
     )
 
 class Delivery(models.Model):
-    by = models.ForeignKey(
-		'User',
-        on_delete=models.CASCADE,
-    )
-    driver = models.ForeignKey(
-        'Driver',
-        on_delete=models.CASCADE,
-    )
+    by = User
+    driver = Driver
     origin = models.PointField()
     destination = models.PointField()
 

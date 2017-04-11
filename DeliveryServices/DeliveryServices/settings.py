@@ -43,7 +43,7 @@ INSTALLED_APPS = (
     'rest_framework_gis',
     'rest_framework.authtoken',
     'leaflet',
-	'api'
+	'app'
 )
 
 MIDDLEWARE_CLASSES = (
@@ -57,7 +57,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.security.SecurityMiddleware',
 )
 
-AUTH_USER_MODEL = 'api.User'
+AUTH_USER_MODEL = 'app.User'
 
 ROOT_URLCONF = 'DeliveryServices.urls'
 
