@@ -13,7 +13,7 @@ WORKDIR /var/www/
 
 ENV PYTHONPATH "/bin/python"
 ENV DJANGO_SETTINGS_MODULE "DeliveryServices.settings"
-RUN python --version
+
 CMD ["python", "./manage.py", "runserver", "0.0.0.0:8000"]
 
 EXPOSE 8000
