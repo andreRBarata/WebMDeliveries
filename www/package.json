@@ -10,6 +10,8 @@
   "license": "ISC",
   "dependencies": {
     "bootstrap": "^3.3.7",
-    "cordova-jquery": "^0.1.6"
+    "cordova-jquery": "^0.1.6",
+    "jquery-mobile": "^1.4.1",
+    "js-cookie": "^2.1.4"
   }
 }

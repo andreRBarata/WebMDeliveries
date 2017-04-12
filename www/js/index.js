@@ -28,18 +28,26 @@ var app = {
     // 'pause', 'resume', etc.
     onDeviceReady: function() {
         this.receivedEvent('deviceready');
+
+		$.ajax({
+			url: 'http://localhost:8000/api/login/',
+		    type: 'post',
+		    data: {
+				username: 'andre',
+				password: 'password'
+		    },
+		    headers: {
+		        'X-CSRFToken': Cookies.get('csrftoken')
+		    },
+		    dataType: 'json'
+		}).done(function(data) {
+			console.log(arguments);
+		});
     },
 
     // Update DOM on a Received Event
     receivedEvent: function(id) {
-        var parentElement = document.getElementById(id);
-        var listeningElement = parentElement.querySelector('.listening');
-        var receivedElement = parentElement.querySelector('.received');
 
-        listeningElement.setAttribute('style', 'display:none;');
-        receivedElement.setAttribute('style', 'display:block;');
-
-        console.log('Received Event: ' + id);
     }
 };
 

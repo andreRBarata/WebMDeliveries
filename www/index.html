@@ -1,50 +1,132 @@
 <!DOCTYPE html>
 <!--
-    Licensed to the Apache Software Foundation (ASF) under one
-    or more contributor license agreements.  See the NOTICE file
-    distributed with this work for additional information
-    regarding copyright ownership.  The ASF licenses this file
-    to you under the Apache License, Version 2.0 (the
-    "License"); you may not use this file except in compliance
-    with the License.  You may obtain a copy of the License at
+	Licensed to the Apache Software Foundation (ASF) under one
+	or more contributor license agreements.  See the NOTICE file
+	distributed with this work for additional information
+	regarding copyright ownership.  The ASF licenses this file
+	to you under the Apache License, Version 2.0 (the
+	"License"); you may not use this file except in compliance
+	with the License.  You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+	http://www.apache.org/licenses/LICENSE-2.0
 
-    Unless required by applicable law or agreed to in writing,
-    software distributed under the License is distributed on an
-    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-     KIND, either express or implied.  See the License for the
-    specific language governing permissions and limitations
-    under the License.
+	Unless required by applicable law or agreed to in writing,
+	software distributed under the License is distributed on an
+	"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+	 KIND, either express or implied.  See the License for the
+	specific language governing permissions and limitations
+	under the License.
 -->
 <html>
-    <head>
-        <!--
-        Customize this policy to fit your own app's needs. For more guidance, see:
-            https://github.com/apache/cordova-plugin-whitelist/blob/master/README.md#content-security-policy
-        Some notes:
-            * gap: is required only on iOS (when using UIWebView) and is needed for JS->native communication
-            * https://ssl.gstatic.com is required only on Android and is needed for TalkBack to function properly
-            * Disables use of inline scripts in order to mitigate risk of XSS vulnerabilities. To change this:
-                * Enable inline JS: add 'unsafe-inline' to default-src
-        -->
-        <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: gap: https://ssl.gstatic.com 'unsafe-eval'; style-src 'self' 'unsafe-inline'; media-src *; img-src 'self' data: content:;">
-        <meta name="format-detection" content="telephone=no">
-        <meta name="msapplication-tap-highlight" content="no">
-        <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
-        <link rel="stylesheet" type="text/css" href="css/index.css">
+	<head>
+		<!--
+		Customize this policy to fit your own app's needs. For more guidance, see:
+			https://github.com/apache/cordova-plugin-whitelist/blob/master/README.md#content-security-policy
+		Some notes:
+			* gap: is required only on iOS (when using UIWebView) and is needed for JS->native communication
+			* https://ssl.gstatic.com is required only on Android and is needed for TalkBack to function properly
+			* Disables use of inline scripts in order to mitigate risk of XSS vulnerabilities. To change this:
+				* Enable inline JS: add 'unsafe-inline' to default-src
+		-->
+		<meta http-equiv="Content-Security-Policy" content="default-src 'self' data: gap: https://ssl.gstatic.com
+			  http://*******************/
+			  http://127.0.0.1:8000 http://localhost:8000
+			  https://*.tile.openstreetmap.org https://*.tile.osm.org
+			  http://*.tile.openstreetmap.org http://*.tile.osm.org
+			  'unsafe-eval';
+			  style-src 'self' 'unsafe-inline';
+			  script-src 'self' 'unsafe-inline';
+			  media-src *">
+		<meta name="format-detection" content="telephone=no">
+		<meta name="msapplication-tap-highlight" content="no">
+		<meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
+		<script src="node_modules/jquery/dist/jquery.min.js"></script>
+		<script src="node_modules/jquery-mobile/dist/jquery.mobile.js"></script>
+		<script src="node_modules/js-cookie/src/js.cookie.js"></script>
+		<link rel="stylesheet" type="text/css" href="node_modules/jquery-mobile/dist/jquery.mobile.min.css">
+		<link rel="stylesheet" type="text/css" href="css/index.css">
+
 		<link rel="stylesheet" type="text/css" href="node_modules/bootstrap/dist/css/bootstrap.css">
 		<title>Deliveries</title>
-    </head>
-    <body>
-        <div class="app">
-            <h1>Apache Cordova</h1>
-            <div id="deviceready" class="blink">
-                <p class="event listening">Connecting to Device</p>
-                <p class="event received">Device is Ready</p>
-            </div>
-        </div>
-        <script type="text/javascript" src="cordova.js"></script>
-        <script type="text/javascript" src="js/index.js"></script>
-    </body>
+	</head>
+	<body class="container">
+		<div data-role="page" style="background-color: white" id="main-page">
+			<div id="main-div" data-role="main" class="ui-content">
+				<h1>Main Page placeholder</h1>
+			</div>
+			<div data-role="footer" data-id="main-foot" class="ui-header ui-bar-a" role="banner" data-position="fixed"
+				 style="text-align:center; background-color: rgba(255,255,255,0.2);" data-tap-toggle="false">
+				<table>
+					<tr>
+						<td style="text-align: left; vertical-align: middle; width: 10%">
+							<a href="#map-page" id="goto-map" class="ui-btn-mini ui-btn-inline">
+								<span class="fa fa-map fa-2x" style="color:lightslategrey"></span>
+							</a>
+						</td>
+						<td></td>
+						<td></td>
+					</tr>
+				</table>
+			</div>
+		</div>
+
+
+		<div data-role="page" style="background-color: white" id="map-page">
+			<div data-role="header" style="text-align:center; background-color: rgba(255,255,255,0.8);" data-position="fixed"
+				 data-tap-toggle="false">
+				<table style="width: 100%">
+					<tr>
+						<td style="text-align: left; vertical-align: middle; width: 85%">
+							<span style="font-size: large">Web Mapping 2017</span>
+						</td>
+						<td style="text-align: right; vertical-align: middle; width: 15%">
+							<span class="sp-username"></span>&nbsp;
+							<span class="plain-a" id="sp-logout">
+								<i class='fa fa-sign-out fa-3x'></i></span>
+						</td>
+					</tr>
+				</table>
+			</div>
+			<div id="map-var" style="width: 100%; height: 100%;"></div>
+			<div data-role="footer" style="text-align:center; background-color: rgba(255,255,255,0.2);" data-position="fixed"
+				 data-tap-toggle="false">
+				<table style="width: 100%">
+					<tr>
+						<td style="text-align: left; vertical-align: middle; width: 10%">
+							<a id="goto-currentlocation" class="ui-btn-mini ui-btn-inline">
+								<span class="fa fa-crosshairs fa-3x" style="color:deepskyblue"></span>
+							</a>
+						</td>
+						<td></td>
+						<td></td>
+					</tr>
+				</table>
+				<span id="leaflet-copyright" style="font-size: xx-small"></span>
+			</div>
+		</div>
+
+		<div data-role="page" data-dialog="true" data-close-btn="none" style="background-color: white" id="login-page">
+			<div data-role="header" style="text-align: center; background-color: silver">
+				<span style="font-size: x-large">Deliveries Inc.</span>
+			</div>
+
+			<div data-role="main" class="ui-content"
+				 style="align-content: center; background-color: white">
+				<form role="form">
+					<div class="ui-field-contain">
+						<label id="label-in-username" for="in-username"><span class="fa fa-user fa-fw"></span></label>
+						<input type="text" class="form-control" id="in-username" placeholder="Username">
+						<label id="label-in-password" for="in-password"><span class="fa fa-lock fa-fw"></span></label>
+						<input type="password" class="form-control" id="in-password" placeholder="Password">
+					</div>
+					<button id="btn-login" type="button" class="ui-btn ui-corner-all live-button"
+							style="background-color: #669966; color: white;">
+						<span class="fa fa-sign-in fa-lg"></span> Log In
+					</button>
+				</form>
+			</div>
+		</div>
+		<script type="text/javascript" src="cordova.js"></script>
+		<script type="text/javascript" src="js/index.js"></script>
+	</body>
 </html>
