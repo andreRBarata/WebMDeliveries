@@ -112,14 +112,20 @@
 
 			<div data-role="main" class="ui-content"
 				 style="align-content: center; background-color: white">
-				<form role="form">
+				<form role="form" id="login" action="javascript:">
 					<div class="ui-field-contain">
-						<label id="label-in-username" for="in-username"><span class="fa fa-user fa-fw"></span></label>
-						<input type="text" class="form-control" id="in-username" placeholder="Username">
-						<label id="label-in-password" for="in-password"><span class="fa fa-lock fa-fw"></span></label>
-						<input type="password" class="form-control" id="in-password" placeholder="Password">
+						<label id="label-in-username" for="in-username">
+							<span class="fa fa-user fa-fw"></span>
+						</label>
+						<input type="text" class="form-control"
+							name="username" id="in-username" placeholder="Username">
+						<label id="label-in-password" for="in-password">
+							<span class="fa fa-lock fa-fw"></span>
+						</label>
+						<input type="password" class="form-control"
+							name="password" id="in-password" placeholder="Password">
 					</div>
-					<button id="btn-login" type="button" class="ui-btn ui-corner-all live-button"
+					<button type="submit" id="btn-login" type="button" class="ui-btn ui-corner-all live-button"
 							style="background-color: #669966; color: white;">
 						<span class="fa fa-sign-in fa-lg"></span> Log In
 					</button>

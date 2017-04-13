@@ -29,20 +29,36 @@ var app = {
     onDeviceReady: function() {
         this.receivedEvent('deviceready');
 
-		$.ajax({
-			url: 'http://localhost:8000/api/login/',
-		    type: 'post',
-		    data: {
-				username: 'andre',
-				password: 'password'
-		    },
-		    headers: {
-		        'X-CSRFToken': Cookies.get('csrftoken')
-		    },
-		    dataType: 'json'
-		}).done(function(data) {
-			console.log(arguments);
+		if (localStorage.getItem('token')) {
+			window.location.hash = 'login-page';
+		}
+
+		$('#login').on('submit', function () {
+			var serielized = $(this).serializeArray();
+			var data = {};
+			var i;
+
+			for (i in serielized) {
+				var ele = serielized[i];
+
+				data[ele.name] = ele.value;
+			}
+
+			$.ajax({
+				url: 'http://localhost:8000/api/login/',
+			    type: 'post',
+			    data: data,
+			    headers: {
+			        'X-CSRFToken': Cookies.get('csrftoken')
+			    },
+			    dataType: 'json'
+			}).done(function(res) {
+				localStorage.setItem('token', res.token);
+				window.location.hash = 'page-main';
+			});
 		});
+
+
     },
 
     // Update DOM on a Received Event
