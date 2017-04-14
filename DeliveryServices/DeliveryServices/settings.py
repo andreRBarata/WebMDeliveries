@@ -23,9 +23,11 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '4ie@0m$o*02sil26%tymw98+&tt8$9rc#e009ll4qci3cy)--0'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DEV', False)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+	'*'
+]
 
 
 # Application definition
@@ -43,7 +45,8 @@ INSTALLED_APPS = (
     'rest_framework_gis',
     'rest_framework.authtoken',
     'leaflet',
-	'api'
+	'api',
+	'app'
 )
 
 MIDDLEWARE_CLASSES = (
@@ -64,7 +67,7 @@ ROOT_URLCONF = 'DeliveryServices.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': ['DeliveryServices/templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -83,16 +86,30 @@ WSGI_APPLICATION = 'DeliveryServices.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        'NAME': 'deliveries',
-        'USER': 'django',
-        'PASSWORD': 'password',
-        'HOST': '104.236.43.237',
-        'PORT': '5432',
-    }
-}
+if (os.environ.get('DEV', False)):
+	DATABASES = {
+		'default': {
+	        'ENGINE': 'django.contrib.gis.db.backends.postgis',
+	        'NAME': 'deliveries',
+	        'USER': 'andre',
+	        'PASSWORD': 'password',
+	        'HOST': 'localhost',
+	        'PORT': '5432',
+	    }
+	}
+else:
+	DATABASES = {
+	    'default': {
+	        'ENGINE': 'django.contrib.gis.db.backends.postgis',
+	        'NAME': 'deliveries',
+	        'USER': 'django',
+	        'PASSWORD': 'password',
+	        'HOST': 'localhost',
+	        'PORT': '5432',
+	    }
+	}
+
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
@@ -111,7 +128,8 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
 
-STATIC_URL = '/app/'
+STATIC_URL = '/static/'
+STATIC_ROOT = '/static/'
 
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),

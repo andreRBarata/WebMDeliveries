@@ -9,13 +9,16 @@ RUN pip install djangorestframework djangorestframework-gis
 
 COPY "DeliveryServices" "/var/www"
 COPY "platforms/browser/www" "/var/www/static"
+COPY "platforms/browser/www/index.html" "/var/www/DeliveryServices/templates/"
+COPY "run.sh" "/var/www"
+
 WORKDIR /var/www/
+
+RUN chmod +x run.sh
 
 ENV PYTHONPATH "/bin/python"
 ENV DJANGO_SETTINGS_MODULE "DeliveryServices.settings"
 
-RUN python ./manage migrate
+CMD ["./run.sh"]
 
-CMD ["python", "./manage.py", "runserver", "0.0.0.0:8000"]
-
-EXPOSE 8000
+EXPOSE 80
