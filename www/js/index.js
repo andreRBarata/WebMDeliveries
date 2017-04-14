@@ -16,6 +16,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
+var HOST = 'http://localhost';
+
 var app = {
     // Application Constructor
     initialize: function() {
@@ -29,7 +32,8 @@ var app = {
     onDeviceReady: function() {
         this.receivedEvent('deviceready');
 
-		if (localStorage.getItem('token')) {
+		if (!localStorage.getItem('token')) {
+			console.log(localStorage.getItem('token'))
 			window.location.hash = 'login-page';
 		}
 
@@ -45,7 +49,7 @@ var app = {
 			}
 
 			$.ajax({
-				url: 'http://localhost:8000/api/login/',
+				url: HOST + '/api/login/',
 			    type: 'post',
 			    data: data,
 			    headers: {
