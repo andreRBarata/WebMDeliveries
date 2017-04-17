@@ -31,10 +31,17 @@ class Driver(models.Model):
     )
 
 class Delivery(models.Model):
-    by = User
-    driver = Driver
+    by = models.ForeignKey(
+        'User',
+        on_delete=models.CASCADE
+    )
+    driver = models.ForeignKey(
+        'Driver',
+        on_delete=models.CASCADE
+    )
     origin = models.PointField()
     destination = models.PointField()
+    date = models.DateTimeField()
 
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
 def create_auth_token(sender, instance=None, created=False, **kwargs):

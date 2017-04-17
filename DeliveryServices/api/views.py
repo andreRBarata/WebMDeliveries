@@ -12,7 +12,7 @@ from rest_framework.authtoken.models import Token
 from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
 from django.utils.decorators import method_decorator
 
-from models import User
+from models import User, Delivery
 
 # Create your views here.
 def user(request):
@@ -25,6 +25,30 @@ def user(request):
         )
 
     return Response({"success": True})
+
+def delivery(request):
+	def post():
+		Delivery.objects
+			.create(
+				by = request.POST['by'],
+			    origin = request.POST['origin'],
+			    destination = request.POST['destination'],
+			    date = request.POST['date']
+			)
+
+	def get():
+		if (len(request.GET) == 0)
+			return Delivery.objects
+				.get(request.GET['id'])
+		else if (len(request.GET) == 1):
+			return Delivery.objects
+				.get()
+
+	if (request.method == 'GET'):
+		return get()
+	else if (request.method == 'POST'):
+		return Response({"success": post()})
+
 
 # @csrf_exempt
 @api_view(["POST", ])

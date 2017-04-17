@@ -19,56 +19,166 @@
 
 var HOST = 'http://localhost';
 
-var app = {
-    // Application Constructor
-    initialize: function() {
-        document.addEventListener('deviceready', this.onDeviceReady.bind(this), false);
-    },
+var app = (function () {
 
-    // deviceready Event Handler
-    //
-    // Bind any cordova events here. Common events are:
-    // 'pause', 'resume', etc.
-    onDeviceReady: function() {
-        this.receivedEvent('deviceready');
+	function formData(form) {
+		var serielized = $(form).serializeArray();
+		var data = {};
+		var i;
 
-		if (!localStorage.getItem('token')) {
-			console.log(localStorage.getItem('token'))
-			window.location.hash = 'login-page';
+		for (i in serielized) {
+			var ele = serielized[i];
+
+			data[ele.name] = ele.value;
 		}
 
-		$('#login').on('submit', function () {
-			var serielized = $(this).serializeArray();
-			var data = {};
-			var i;
+		return data;
+	}
 
-			for (i in serielized) {
-				var ele = serielized[i];
+	var view = {
+		alert: function (message, type) {
+			return $('<div data-role="popup" class="alert alert-' +
+					(type || 'danger') + '">' +
+						'<a href="#" class="close" data-dismiss="alert">&times;</a>' +
+						message +
+					'</div>'
+				).alert();
+		}
+	};
 
-				data[ele.name] = ele.value;
-			}
-
-			$.ajax({
+	var api = {
+		login: function (form) {
+			return $.ajax({
 				url: HOST + '/api/login/',
-			    type: 'post',
-			    data: data,
-			    headers: {
-			        'X-CSRFToken': Cookies.get('csrftoken')
-			    },
-			    dataType: 'json'
+				type: 'post',
+				data: formData(form),
+				headers: {
+					'X-CSRFToken': Cookies.get('csrftoken')
+				},
+				dataType: 'json'
 			}).done(function(res) {
 				localStorage.setItem('token', res.token);
-				window.location.hash = 'page-main';
+
+				$.mobile.navigate('#page-main');
+			}).fail(function () {
+				$('#login-page .messages').append(
+					view.alert('Username or password incorrect')
+				);
 			});
-		});
+		},
+		logout: function () {
+			localStorage.removeItem('token');
 
+			$.mobile.navigate('#login-page');
+		}
+	};
 
-    },
+	var map = {
+		makeBasicMap: function () {
+			mapElement = L.map("map-var", {
+				zoomControl: false,
+				attributionControl: false
+			}).fitWorld();
 
-    // Update DOM on a Received Event
-    receivedEvent: function(id) {
+			L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+				useCache: true
+			}).addTo(mapElement);
 
-    }
-};
+			$("#leaflet-copyright").html("Leaflet | Map Tiles &copy; <a href='http://openstreetmap.org'>OpenStreetMap</a> contributors");
 
-app.initialize();
+			return mapElement;
+		},
+		getCurrentlocation: function () {
+			var myLatLon;
+			var myPos;
+
+			navigator.geolocation.getCurrentPosition(
+				function (pos) {
+					// myLatLon = L.latLng(pos.coords.latitude, pos.coords.longitude);
+					myPos = new myGeoPosition(pos);
+					localStorage.lastKnownCurrentPosition = JSON.stringify(myPos);
+
+					setMapToCurrentLocation();
+					updatePosition();
+				},
+				function (err) {
+				},
+				{
+					enableHighAccuracy: true
+					// maximumAge: 60000,
+					// timeout: 5000
+				}
+			);
+		},
+	};
+
+	return {
+		// Application Constructor
+		initialize: function() {
+			document.addEventListener(
+				'deviceready',
+				this.onDeviceReady.bind(this),
+				false
+			);
+
+			$('form').attr('action', 'javascript: ');
+		},
+
+		// deviceready Event Handler
+		//
+		// Bind any cordova events here. Common events are:
+		// 'pause', 'resume', etc.
+		onDeviceReady: function() {
+			var mapElement;
+
+			if (!localStorage.getItem('token')) {
+				$.mobile.navigate('#login-page');
+			}
+			else if ($.mobile.activePage.attr('id') === 'login-page') {
+				$.mobile.navigate('#main-page');
+			}
+
+			this.receivedEvent('deviceready');
+
+			$(document).on("pagecreate", "#map-page",
+				function (event) {
+			        console.log("In pagecreate. Target is " + event.target.id + ".");
+
+			        // $("#goto-currentlocation").on("touchstart", function () {
+			        //     getCurrentlocation();
+			        // });
+
+			        $("#map-page").enhanceWithin();
+
+			        mapElement = map.makeBasicMap();
+			        // getCurrentlocation();
+			    }
+			);
+
+		    $(document).on("pageshow",
+				function (event) {
+			        console.log("In pageshow. Target is " + event.target.id + ".");
+			        if (!localStorage.token) {
+			            $.mobile.navigate("#login-page");
+			        }
+			    }
+			);
+
+		    $(document).on("pageshow", "#map-page", function () {
+		        console.log("In pageshow / #map-page.");
+		        mapElement.invalidateSize();
+		    });
+
+		    $('div[data-role="page"]').page();
+		},
+
+		api: api,
+		map: map,
+
+		// Update DOM on a Received Event
+		receivedEvent: function(id) {
+
+		}
+	};
+
+})();
