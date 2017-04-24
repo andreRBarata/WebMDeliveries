@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from rest_framework.response import Response
 from django.shortcuts import render
 
@@ -27,27 +27,25 @@ def user(request):
     return Response({"success": True})
 
 def delivery(request):
-	def post():
-		Delivery.objects
-			.create(
-				by = request.POST['by'],
-			    origin = request.POST['origin'],
-			    destination = request.POST['destination'],
-			    date = request.POST['date']
-			)
+    def post():
+        Delivery.objects.create(
+            by = request.user,
+            origin = request.POST['origin'],
+            destination = request.POST['destination'],
+            date = request.POST['date']
+        )
 
-	def get():
-		if (len(request.GET) == 0)
-			return Delivery.objects
-				.get(request.GET['id'])
-		else if (len(request.GET) == 1):
-			return Delivery.objects
-				.get()
+    def get():
+        print_r(Delivery.objects.get(
+			by = request.user
+		))
 
-	if (request.method == 'GET'):
-		return get()
-	else if (request.method == 'POST'):
-		return Response({"success": post()})
+    if (request.method == 'GET'):
+        return JsonResponse(get())
+    elif (request.method == 'POST'):
+        return JsonResponse({'success': post()})
+    else:
+        return JsonResponse({'success': False})
 
 
 # @csrf_exempt
@@ -56,7 +54,7 @@ def delivery(request):
 def auth_login(request):
 
     if ((not request.POST["username"]) or (not request.POST["password"])):
-		return Response({"detail": "Missing username and/or password"}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"detail": "Missing username and/or password"}, status=status.HTTP_400_BAD_REQUEST)
 
     if ((not request.POST["username"]) or (not request.POST["password"])):
         return Response({"detail": "Missing username and/or password"}, status=status.HTTP_400_BAD_REQUEST)

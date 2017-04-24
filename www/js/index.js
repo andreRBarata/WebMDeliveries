@@ -21,19 +21,7 @@ var HOST = 'http://localhost';
 
 var app = (function () {
 
-	function formData(form) {
-		var serielized = $(form).serializeArray();
-		var data = {};
-		var i;
 
-		for (i in serielized) {
-			var ele = serielized[i];
-
-			data[ele.name] = ele.value;
-		}
-
-		return data;
-	}
 
 	var view = {
 		alert: function (message, type) {
@@ -47,16 +35,36 @@ var app = (function () {
 	};
 
 	var api = {
-		login: function (form) {
+		call: function (method, func, form) {
+			function formData(form) {
+				var serielized = $(form).serializeArray();
+				var data = {};
+				var i;
+
+				for (i in serielized) {
+					var ele = serielized[i];
+
+					data[ele.name] = ele.value;
+				}
+
+				return data;
+			}
+
 			return $.ajax({
-				url: HOST + '/api/login/',
-				type: 'post',
+				url: HOST + '/api/' + func + '/',
+				type: method,
 				data: formData(form),
 				headers: {
-					'X-CSRFToken': Cookies.get('csrftoken')
+					'X-CSRFToken': Cookies.get('csrftoken'),
+					'Authorization': localStorage.token
 				},
 				dataType: 'json'
-			}).done(function(res) {
+			});
+		},
+		login: function (form) {
+			return api.call(
+				'post', 'login', form
+			).done(function(res) {
 				localStorage.setItem('token', res.token);
 
 				$.mobile.navigate('#page-main');
@@ -65,6 +73,11 @@ var app = (function () {
 					view.alert('Username or password incorrect')
 				);
 			});
+		},
+		delivery: function (form) {
+			return api.call(
+				'post', 'delivery', form
+			);
 		},
 		logout: function () {
 			localStorage.removeItem('token');
@@ -170,6 +183,7 @@ var app = (function () {
 		    });
 
 		    $('div[data-role="page"]').page();
+			$('input[type=datetime]').datetimepicker();
 		},
 
 		api: api,
