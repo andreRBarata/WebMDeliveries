@@ -9,6 +9,9 @@
     "installed_plugins": {
         "cordova-plugin-whitelist": {
             "PACKAGE_NAME": "com.gmail.barata.quina.andre.deliveries"
+        },
+        "cordova-plugin-device": {
+            "PACKAGE_NAME": "com.gmail.barata.quina.andre.deliveries"
         }
     },
     "dependent_plugins": {}

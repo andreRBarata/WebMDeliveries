@@ -8,8 +8,8 @@ RUN pip install django_extensions django-leaflet psycopg2
 RUN pip install djangorestframework djangorestframework-gis
 
 COPY "DeliveryServices" "/var/www"
-COPY "platforms/browser/www" "/var/www/static"
-COPY "platforms/browser/www/index.html" "/var/www/DeliveryServices/templates/"
+COPY "deliveries/platforms/browser/www" "/var/www/static"
+COPY "deliveries/platforms/browser/www/index.html" "/var/www/DeliveryServices/templates/"
 COPY "run.sh" "/var/www"
 
 WORKDIR /var/www/

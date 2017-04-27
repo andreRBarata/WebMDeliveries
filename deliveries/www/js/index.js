@@ -17,11 +17,10 @@
  * under the License.
  */
 
-var HOST = 'http://localhost';
+var HOST = 'http://192.168.1.36';
 
 var app = (function () {
-
-
+	var mapElement;
 
 	var view = {
 		alert: function (message, type) {
@@ -31,6 +30,19 @@ var app = (function () {
 						message +
 					'</div>'
 				).alert();
+		},
+		modalinput: function (page, ele) {
+			$.mobile.navigate(page);
+
+			$(page).find('[role=inputsubmit]')
+				.one('click', function () {
+					var value = $(page)
+						.find('[role=inputreturn]')
+						.val();
+
+					$(ele).val(value);
+					$(page).dialog('close');
+				});
 		}
 	};
 
@@ -88,8 +100,9 @@ var app = (function () {
 
 	var map = {
 		makeBasicMap: function () {
-			mapElement = L.map("map-var", {
-				zoomControl: false,
+			mapElement = L.map('map-var', {
+				zoomControl: true,
+				zoomLevel: 18,
 				attributionControl: false
 			}).fitWorld();
 
@@ -97,7 +110,7 @@ var app = (function () {
 				useCache: true
 			}).addTo(mapElement);
 
-			$("#leaflet-copyright").html("Leaflet | Map Tiles &copy; <a href='http://openstreetmap.org'>OpenStreetMap</a> contributors");
+			$('#leaflet-copyright').html('Leaflet | Map Tiles &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors');
 
 			return mapElement;
 		},
@@ -107,12 +120,13 @@ var app = (function () {
 
 			navigator.geolocation.getCurrentPosition(
 				function (pos) {
-					// myLatLon = L.latLng(pos.coords.latitude, pos.coords.longitude);
-					myPos = new myGeoPosition(pos);
-					localStorage.lastKnownCurrentPosition = JSON.stringify(myPos);
+					var myLatLon = L.latLng(
+						pos.coords.latitude,
+						pos.coords.longitude
+					);
 
-					setMapToCurrentLocation();
-					updatePosition();
+					L.marker(myLatLon)
+						.addTo(mapElement);
 				},
 				function (err) {
 				},
@@ -122,7 +136,7 @@ var app = (function () {
 					// timeout: 5000
 				}
 			);
-		},
+		}
 	};
 
 	return {
@@ -134,7 +148,6 @@ var app = (function () {
 				false
 			);
 
-			$('form').attr('action', 'javascript: ');
 		},
 
 		// deviceready Event Handler
@@ -142,7 +155,7 @@ var app = (function () {
 		// Bind any cordova events here. Common events are:
 		// 'pause', 'resume', etc.
 		onDeviceReady: function() {
-			var mapElement;
+			$('form').attr('action', 'javascript: ');
 
 			if (!localStorage.getItem('token')) {
 				$.mobile.navigate('#login-page');
@@ -153,41 +166,39 @@ var app = (function () {
 
 			this.receivedEvent('deviceready');
 
-			$(document).on("pagecreate", "#map-page",
+			$(document).on('pagecreate', '#map-page',
 				function (event) {
-			        console.log("In pagecreate. Target is " + event.target.id + ".");
+					console.log('In pagecreate. Target is ' + event.target.id + '.');
 
-			        // $("#goto-currentlocation").on("touchstart", function () {
-			        //     getCurrentlocation();
-			        // });
+					$('#map-page').enhanceWithin();
 
-			        $("#map-page").enhanceWithin();
-
-			        mapElement = map.makeBasicMap();
-			        // getCurrentlocation();
-			    }
+					mapElement = map.makeBasicMap();
+				}
 			);
 
-		    $(document).on("pageshow",
+			$(document).on('pageshow',
 				function (event) {
-			        console.log("In pageshow. Target is " + event.target.id + ".");
-			        if (!localStorage.token) {
-			            $.mobile.navigate("#login-page");
-			        }
-			    }
+					if (!localStorage.token) {
+						$.mobile.navigate('#login-page');
+					}
+				}
 			);
 
-		    $(document).on("pageshow", "#map-page", function () {
-		        console.log("In pageshow / #map-page.");
-		        mapElement.invalidateSize();
-		    });
+			$(document).on('pageshow', '#map-page', function () {
+				mapElement.invalidateSize();
+			});
 
-		    $('div[data-role="page"]').page();
-			$('input[type=datetime]').datetimepicker();
+			$('div[data-role="page"]').page();
+			$('#calendar').datetimepicker({
+				inline: true,
+				sideBySide: true,
+				format: 'YYYY-MM-DD HH:mm'
+			});
 		},
 
 		api: api,
 		map: map,
+		view: view,
 
 		// Update DOM on a Received Event
 		receivedEvent: function(id) {
