@@ -15,6 +15,7 @@ COPY "run.sh" "/var/www"
 WORKDIR /var/www/
 
 RUN chmod +x run.sh
+RUN sed -i -e 's/<base href="">/<base href="\/static\/">/g' "DeliveryServices/templates/index.html"
 
 ENV PYTHONPATH "/bin/python"
 ENV DJANGO_SETTINGS_MODULE "DeliveryServices.settings"

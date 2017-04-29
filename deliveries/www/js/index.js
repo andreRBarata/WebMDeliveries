@@ -20,6 +20,8 @@
 var HOST = 'http://192.168.1.36';
 
 var app = (function () {
+	"use strict";
+
 	var mapElement;
 
 	var view = {
@@ -31,10 +33,15 @@ var app = (function () {
 					'</div>'
 				).alert();
 		},
-		modalinput: function (page, ele) {
-			$.mobile.navigate(page);
+		changepage: function (page, option) {
+			console.log('Change to page ' + page);
 
-			$(page).find('[role=inputsubmit]')
+			$.mobile.navigate(page, option);
+		},
+		modalinput: function (page, ele) {
+			view.changepage(page);
+
+			return $(page).find('[role=inputsubmit]')
 				.one('click', function () {
 					var value = $(page)
 						.find('[role=inputreturn]')
@@ -46,98 +53,182 @@ var app = (function () {
 		}
 	};
 
+	var transform = {
+		geojson: function (data) {
+			var coords = data.split(', ')
+				.map(parseFloat);
+
+			return {
+				lat: coords[0],
+				lng: coords[1]
+			};
+		}
+	};
+
 	var api = {
 		call: function (method, func, form) {
 			function formData(form) {
-				var serielized = $(form).serializeArray();
-				var data = {};
-				var i;
+				var toReturn = {};
+				var serielized = $(form).find('[name]')
+					.each(function (i, ele) {
+						var data = $(ele).val();
 
-				for (i in serielized) {
-					var ele = serielized[i];
+						if ($(ele).attr('data-transform')) {
+							data = transform[$(ele)
+								.attr('data-transform')](data);
 
-					data[ele.name] = ele.value;
-				}
+							if (data instanceof Object) {
+								$.each(data, function (name, value) {
+									toReturn[
+										$(ele).attr('name') + '_' + name
+									] = value;
+								});
 
-				return data;
+								return;
+							}
+						}
+
+						return toReturn[$(ele).attr('name')] = data;
+					});
+
+
+				return toReturn;
 			}
 
-			return $.ajax({
-				url: HOST + '/api/' + func + '/',
-				type: method,
-				data: formData(form),
-				headers: {
-					'X-CSRFToken': Cookies.get('csrftoken'),
-					'Authorization': localStorage.token
-				},
-				dataType: 'json'
+			return new Promise(function (resolve, reject) {
+				console.log('Sending');
+				$.ajax({
+					url: HOST + '/api/' + func + '/',
+					type: method,
+					data: formData(form),
+					beforeSend: function (xhr) {
+
+						if (Cookies.get('csrftoken')) {
+							xhr.setRequestHeader(
+								'X-CSRFToken',
+								Cookies.get('csrftoken')
+							);
+						}
+						if (localStorage.token) {
+							xhr.setRequestHeader(
+								'Authorization',
+								localStorage.token
+							);
+						}
+					},
+					dataType: 'json'
+				}).done(resolve)
+					.fail(function (err) {
+						var obj = err.responseJSON;
+
+						reject(
+							(obj)? obj.detail:
+								err.responseText
+						);
+					});
 			});
 		},
 		login: function (form) {
 			return api.call(
 				'post', 'login', form
-			).done(function(res) {
+			).then(function(res) {
 				localStorage.setItem('token', res.token);
 
-				$.mobile.navigate('#page-main');
-			}).fail(function () {
+				view.changepage('#page-main');
+			}).catch(function (err) {
 				$('#login-page .messages').append(
-					view.alert('Username or password incorrect')
+					view.alert(err ||
+						'Could not login'
+					)
 				);
 			});
 		},
 		delivery: function (form) {
 			return api.call(
 				'post', 'delivery', form
-			);
+			).then(function (res) {
+				$('#main-page .messages').append(
+					view.alert('Delivery has been created', 'success')
+				);
+
+				form.reset();
+			}).catch(function (err) {
+				$('#main-page .messages').append(
+					view.alert(err ||
+						'Could not create delivery'
+					)
+				);
+			});
 		},
 		logout: function () {
 			localStorage.removeItem('token');
 
-			$.mobile.navigate('#login-page');
+			view.changepage('#login-page');
 		}
 	};
 
-	var map = {
-		makeBasicMap: function () {
-			mapElement = L.map('map-var', {
-				zoomControl: true,
-				zoomLevel: 18,
-				attributionControl: false
-			}).fitWorld();
+	var map = (function () {
+		var point;
 
-			L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-				useCache: true
-			}).addTo(mapElement);
+		return {
+			makeBasicMap: function () {
+				mapElement = L.map('map-var', {
+					center: [53.350140, -6.266155],
+    				zoom: 13
+				});
 
-			$('#leaflet-copyright').html('Leaflet | Map Tiles &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors');
+				L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+					useCache: true
+				}).addTo(mapElement);
 
-			return mapElement;
-		},
-		getCurrentlocation: function () {
-			var myLatLon;
-			var myPos;
+				$('#leaflet-copyright').html('Leaflet | Map Tiles &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors');
 
-			navigator.geolocation.getCurrentPosition(
-				function (pos) {
-					var myLatLon = L.latLng(
-						pos.coords.latitude,
-						pos.coords.longitude
-					);
+				return mapElement;
+			},
+			getCurrentlocation: function () {
+				var myLatLon;
+				var myPos;
 
-					L.marker(myLatLon)
+				return new Promise(
+					function (resolve, reject) {
+						navigator.geolocation.getCurrentPosition(
+							function (pos) {
+								resolve(L.latLng(
+									pos.coords.latitude,
+									pos.coords.longitude
+								));
+							},
+							reject,
+							{
+								enableHighAccuracy: true
+								// maximumAge: 60000,
+								// timeout: 5000
+							}
+						);
+					}
+				);
+			},
+			gotoCurrentPosition() {
+				return map.getCurrentlocation()
+					.then(function (coords) {
+						map.setTick(coords);
+					});
+			},
+			setTick(coords) {
+				if (!point) {
+					point = L.marker(coords)
 						.addTo(mapElement);
-				},
-				function (err) {
-				},
-				{
-					enableHighAccuracy: true
-					// maximumAge: 60000,
-					// timeout: 5000
 				}
-			);
-		}
-	};
+				else {
+					point.setLatLng(coords);
+				}
+
+				$('#map-page')
+					.find('#map-coords')
+					.val(coords.lat + ', ' + coords.lng);
+			}
+		};
+	})();
 
 	return {
 		// Application Constructor
@@ -157,11 +248,11 @@ var app = (function () {
 		onDeviceReady: function() {
 			$('form').attr('action', 'javascript: ');
 
-			if (!localStorage.getItem('token')) {
-				$.mobile.navigate('#login-page');
+			if (!localStorage.token) {
+				view.changepage('#login-page');
 			}
 			else if ($.mobile.activePage.attr('id') === 'login-page') {
-				$.mobile.navigate('#main-page');
+				view.changepage('#main-page');
 			}
 
 			this.receivedEvent('deviceready');
@@ -173,20 +264,26 @@ var app = (function () {
 					$('#map-page').enhanceWithin();
 
 					mapElement = map.makeBasicMap();
+
+					mapElement.invalidateSize();
+					mapElement.on('click', function (ev) {
+						console.log('Click in map');
+						var latlng = mapElement
+							.mouseEventToLatLng(ev.originalEvent);
+
+						map.setTick(latlng);
+					});
+
 				}
 			);
 
 			$(document).on('pageshow',
 				function (event) {
 					if (!localStorage.token) {
-						$.mobile.navigate('#login-page');
+						view.changepage('#login-page');
 					}
 				}
 			);
-
-			$(document).on('pageshow', '#map-page', function () {
-				mapElement.invalidateSize();
-			});
 
 			$('div[data-role="page"]').page();
 			$('#calendar').datetimepicker({

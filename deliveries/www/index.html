@@ -28,8 +28,8 @@
 			* Disables use of inline scripts in order to mitigate risk of XSS vulnerabilities. To change this:
 				* Enable inline JS: add 'unsafe-inline' to default-src
 		-->
-		<meta http-equiv="Content-Security-Policy" content="default-src 'self' data: gap: https://ssl.gstatic.com
-			  http://*******************/
+		<meta http-equiv="Content-Security-Policy" content="default-src 'self'
+			  data: gap: https://ssl.gstatic.com
 			  http://127.0.0.1 http://localhost http://192.168.1.36
 			  https://*.tile.openstreetmap.org https://*.tile.osm.org
 			  http://*.tile.openstreetmap.org http://*.tile.osm.org
@@ -39,7 +39,7 @@
 			  media-src *">
 		<meta name="format-detection" content="telephone=no">
 		<meta name="msapplication-tap-highlight" content="no">
-		<base href="/static/">
+		<base href="">
 		<meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
 		<script type="text/javascript" src="cordova.js"></script>
 		<script src="node_modules/jquery/dist/jquery.min.js"></script>
@@ -61,91 +61,6 @@
 		<title>Deliveries</title>
 	</head>
 	<body class="container" onload="app.initialize()">
-		<div data-role="page" id="main-page">
-			<div data-role="header" style="text-align:center; background-color: rgba(255,255,255,0.8);" data-position="fixed" data-tap-toggle="false">
-
-				<div class="container">
-
-					<span style="font-size: large" class="col-md-10 col-xs-10 navbar-brand">
-						Deliveries Inc.
-					</span>
-
-					<span class="sp-username"></span>
-
-					<span class="col-md-1 col-xs-1 navbar-nav" onclick="app.api.logout()">
-						<i class="fa fa-sign-out fa-2x"></i>
-						<span class="hidden-xs visible-inline">
-							logout
-						</span>
-					</span>
-			   </div>
-			</div>
-			<div data-role="main" class="ui-content content">
-				<h1>Deliveries Inc.</h1>
-
-				<p>
-					Welcome to the Deliveries Inc. delivery service.
-					Fill the form bellow to schedule a delivery or move.
-				</p>
-
-				<form onsubmit="app.api.delivery(this)">
-					<div class="ui-field-contain">
-						<input type="text" name="origin"
-							onclick="app.view.modalinput('#map-page', this)">
-
-						<input type="text" name="destination"
-							onclick="app.view.modalinput('#map-page', this)">
-
-						<input type="datetime" name="date" readonly
-							onclick="app.view.modalinput('#calendar-page', this)">
-
-						<button type="submit" class="ui-btn ui-corner-all live-button" style="background-color: #669966; color: white;">
-							<span class="fa fa-sign-in fa-lg"></span> Request delivery
-						</button>
-					</div>
-				</form>
-			</div>
-			<div data-role="footer" data-id="main-foot" class="ui-header ui-bar-a" role="banner" data-position="fixed" style="text-align:center; background-color: rgba(255,255,255,0.2);" data-tap-toggle="false">
-				<a href="#map-page" id="goto-map" class="ui-btn-mini ui-btn-inline">
-					<span class="fa fa-map fa-2x" style="color:lightslategrey"></span>
-				</a>
-			</div>
-		</div>
-
-		<div data-role="dialog" id="map-page">
-			<div data-role="header" style="text-align:center; background-color: rgba(255,255,255,0.8);" data-position="fixed" data-tap-toggle="false">
-				<h1>Map</h1>
-			</div>
-			<div data-role="main" class="ui-content" style="width: 100%; height: 25em;">
-				<div id="map-var">
-
-				</div>
-			</div>
-			<div data-role="footer" class="ui-header ui-bar-a" role="banner" data-position="fixed" style="text-align:center; background-color: rgba(255,255,255,0.2);" data-tap-toggle="false">
-				<a class="ui-btn-mini ui-btn-inline" onclick="app.map.getCurrentlocation()">
-					<span class="fa fa-crosshairs fa-3x" style="color:deepskyblue"></span>
-				</a>
-				<span id="leaflet-copyright" style="font-size: xx-small"></span>
-			</div>
-		</div>
-
-		<div data-role="dialog" id="calendar-page">
-			<div data-role="header" style="text-align:center; background-color: rgba(255,255,255,0.8);" data-position="fixed" data-tap-toggle="false">
-				<a href="#" class="ui-btn ui-corner-all ui-icon-delete ui-btn-icon-notext ui-btn-left" data-rel="back">Close</a>
-				<h1 class="ui-title" role="heading" aria-level="1">Dialog</h1>
-			</div>
-			<div data-role="main" class="ui-content">
-				<input type="hidden"
-					role="inputreturn" id="calendar">
-
-				<button role="inputsubmit" class="ui-btn ui-corner-all live-button"
-					style="background-color: #387f99; color: white;">
-						Set
-				</button>
-			</div>
-			<div data-role="footer" class="ui-header ui-bar-a" role="banner" data-position="fixed" style="text-align:center; background-color: rgba(255,255,255,0.2);" data-tap-toggle="false">
-			</div>
-		</div>
 
 		<div data-role="page" data-dialog="true" data-close-btn="none" id="login-page">
 			<div data-role="header" style="text-align: center; background-color: silver">
@@ -174,17 +89,123 @@
 								name="password"
 								placeholder="Password">
 						</div>
-
-						<div class="messages">
-
-						</div>
 					</div>
 
-					<button type="submit" class="ui-btn ui-corner-all live-button" style="background-color: #669966; color: white;">
-						<span class="fa fa-sign-in fa-lg"></span> Log In
+					<div class="messages">
+
+					</div>
+
+					<button type="submit" class="ui-btn ui-corner-all live-button"
+						style="background-color: #669966; color: white;">
+							<span class="fa fa-sign-in fa-lg"></span> Log In
 					</button>
 				</form>
 			</div>
 		</div>
+
+		<div data-role="page" id="main-page">
+			<div data-role="header" style="text-align:center; background-color: rgb(255,255,255);"
+				data-position="fixed" data-tap-toggle="false">
+
+				<div class="container">
+
+					<span style="font-size: large" class="col-md-10 col-xs-10 navbar-brand">
+						Deliveries Inc.
+					</span>
+
+					<span class="sp-username"></span>
+
+					<span class="col-md-1 col-xs-1 navbar-nav" onclick="app.api.logout()">
+						<i class="fa fa-sign-out fa-2x"></i>
+						<span class="hidden-xs visible-inline">
+							logout
+						</span>
+					</span>
+			   </div>
+			</div>
+			<div data-role="main" class="ui-content content">
+				<h1>Deliveries Inc.</h1>
+
+				<p>
+					Welcome to the Deliveries Inc. delivery service.
+					Fill the form bellow to schedule a delivery or move.
+				</p>
+
+				<form onsubmit="app.api.delivery(this)">
+					<div class="ui-field-contain">
+						<label for="del-from">From:</label>
+						<input type="text" name="origin" readonly
+							onclick="app.view.modalinput('#map-page', this)"
+							id="del-from" data-transform="geojson">
+
+						<label for="del-to">To:</label>
+						<input type="text" name="destination" readonly
+							onclick="app.view.modalinput('#map-page', this)"
+							id="del-to" data-transform="geojson">
+
+						<label for="del-date">Date:</label>
+						<input type="datetime" name="date" readonly
+							onclick="app.view.modalinput('#calendar-page', this)"
+							id="del-date">
+					</div>
+
+					<div class="messages">
+
+					</div>
+
+					<button type="submit" class="ui-btn ui-corner-all live-button"
+						style="background-color: #669966; color: white;">
+							<span class="fa fa-sign-in fa-lg"></span>
+							Request delivery
+					</button>
+				</form>
+			</div>
+		</div>
+
+		<div data-role="dialog" id="map-page">
+			<div data-role="header" style="text-align:center; background-color: rgba(255,255,255,0.8);" data-position="fixed" data-tap-toggle="false">
+				<h1>Map</h1>
+			</div>
+			<div data-role="main" class="ui-content" style="width: 100%; height: 25em;">
+				<input type="hidden"
+					role="inputreturn" id="map-coords">
+
+				<div id="map-var">
+
+				</div>
+
+
+			</div>
+			<div data-role="footer" class="ui-header ui-bar-a" role="banner" data-position="fixed" style="text-align:center; background-color: rgba(255,255,255,0.2);" data-tap-toggle="false">
+
+				<a class="ui-btn-mini ui-btn-inline" onclick="app.map.gotoCurrentPosition()">
+					<span class="fa fa-crosshairs fa-3x" style="color:deepskyblue"></span>
+				</a>
+				<button role="inputsubmit" class="ui-btn ui-corner-all live-button"
+					style="background-color: #387f99; color: white;">
+						Set
+				</button>
+				<span id="leaflet-copyright" style="font-size: xx-small"></span>
+			</div>
+		</div>
+
+		<div data-role="dialog" id="calendar-page">
+			<div data-role="header" style="text-align:center; background-color: rgba(255,255,255,0.8);" data-position="fixed" data-tap-toggle="false">
+				<a href="#" class="ui-btn ui-corner-all ui-icon-delete ui-btn-icon-notext ui-btn-left" data-rel="back">Close</a>
+				<h1 class="ui-title" role="heading" aria-level="1">Dialog</h1>
+			</div>
+			<div data-role="main" class="ui-content">
+				<input type="hidden"
+					role="inputreturn" id="calendar">
+
+				<button role="inputsubmit" class="ui-btn ui-corner-all live-button"
+					style="background-color: #387f99; color: white;">
+						Set
+				</button>
+			</div>
+			<div data-role="footer" class="ui-header ui-bar-a" role="banner" data-position="fixed" style="text-align:center; background-color: rgba(255,255,255,0.2);" data-tap-toggle="false">
+			</div>
+		</div>
+
 	</body>
 </html>

@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 from django.http import HttpResponse, JsonResponse
 from rest_framework.response import Response
 from django.shortcuts import render
+from django.contrib.gis.geos import Point
 
 from django.contrib.auth import authenticate, login, logout, get_user_model
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
@@ -28,24 +29,45 @@ def user(request):
 
 def delivery(request):
     def post():
-        Delivery.objects.create(
-            by = request.user,
-            origin = request.POST['origin'],
-            destination = request.POST['destination'],
-            date = request.POST['date']
-        )
+        try:
+            Delivery.objects.create(
+                by = request.user,
+                origin = Point(
+                    float(request.POST["origin_lat"]),
+                    float(request.POST["origin_lng"])
+                ),
+                destination = Point(
+                    float(request.POST["destination_lat"]),
+                    float(request.POST["destination_lng"])
+                ),
+                date = request.POST["date"]
+            )
+        except BaseException as e:
+            return e
+
+        return True
 
     def get():
-        print_r(Delivery.objects.get(
-			by = request.user
-		))
+        return JsonResponse(
+            Delivery.objects.get(
+                by = request.user
+            )
+        )
 
     if (request.method == 'GET'):
         return JsonResponse(get())
     elif (request.method == 'POST'):
-        return JsonResponse({'success': post()})
+        response = post()
+
+        if (response != True):
+            return JsonResponse({
+                "success": False,
+                "detail": response
+            })
+        else:
+            return JsonResponse({"success": True})
     else:
-        return JsonResponse({'success': False})
+        return JsonResponse({"success": False})
 
 
 # @csrf_exempt

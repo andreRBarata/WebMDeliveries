@@ -9,6 +9,11 @@
     left: 0 !important;
 }
 
+.ui-content {
+	max-width: 900px;
+	margin: 0 auto;
+}
+
 .plain-h {
     font-weight: normal;
 }
