@@ -104,22 +104,34 @@
 		</div>
 
 		<div data-role="page" id="main-page">
-			<div data-role="header" style="text-align:center; background-color: rgb(255,255,255);"
+			<div data-role="header"
+				style="text-align:center; background-color: rgb(255,255,255);"
 				data-position="fixed" data-tap-toggle="false">
 
 				<div class="container">
 
-					<span style="font-size: large" class="col-md-10 col-xs-10 navbar-brand">
+					<span style="font-size: large" class="col-md-8 col-xs-7 navbar-brand">
 						Deliveries Inc.
 					</span>
 
-					<span class="sp-username"></span>
+					<span class="col-md-1 col-xs-2 navbar-nav"
+						id="sp-username">
+					</span>
 
-					<span class="col-md-1 col-xs-1 navbar-nav" onclick="app.api.logout()">
-						<i class="fa fa-sign-out fa-2x"></i>
-						<span class="hidden-xs visible-inline">
-							logout
-						</span>
+					<span class="col-md-1 col-xs-2 navbar-nav"
+						onclick="app.api.logout()">
+							<i class="fa fa-list fa-2x"></i>
+							<span class="hidden-xs visible-inline">
+								deliveries
+							</span>
+					</span>
+
+					<span class="col-md-1 col-xs-2 navbar-nav"
+						onclick="app.api.logout()">
+							<i class="fa fa-sign-out fa-2x"></i>
+							<span class="hidden-xs visible-inline">
+								logout
+							</span>
 					</span>
 			   </div>
 			</div>
@@ -136,12 +148,12 @@
 						<label for="del-from">From:</label>
 						<input type="text" name="origin" readonly
 							onclick="app.view.modalinput('#map-page', this)"
-							id="del-from" data-transform="geojson">
+							id="del-from" data-transform="geo">
 
 						<label for="del-to">To:</label>
 						<input type="text" name="destination" readonly
 							onclick="app.view.modalinput('#map-page', this)"
-							id="del-to" data-transform="geojson">
+							id="del-to" data-transform="geo">
 
 						<label for="del-date">Date:</label>
 						<input type="datetime" name="date" readonly

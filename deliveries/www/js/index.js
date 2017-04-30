@@ -36,7 +36,8 @@ var app = (function () {
 		changepage: function (page, option) {
 			console.log('Change to page ' + page);
 
-			$.mobile.navigate(page, option);
+			$.mobile.pageContainer
+				.pagecontainer('change', $(page), option);
 		},
 		modalinput: function (page, ele) {
 			view.changepage(page);
@@ -54,7 +55,7 @@ var app = (function () {
 	};
 
 	var transform = {
-		geojson: function (data) {
+		geo: function (data) {
 			var coords = data.split(', ')
 				.map(parseFloat);
 
@@ -129,14 +130,18 @@ var app = (function () {
 			});
 		},
 		login: function (form) {
+
 			return api.call(
 				'post', 'login', form
 			).then(function(res) {
 				localStorage.setItem('token', res.token);
+				localStorage.setItem('username', form.username.value);
 
-				view.changepage('#page-main');
+				form.reset();
+			}).then(function () {
+				view.changepage('#main-page');
 			}).catch(function (err) {
-				$('#login-page .messages').append(
+				$(form).find('.messages').append(
 					view.alert(err ||
 						'Could not login'
 					)
@@ -147,7 +152,7 @@ var app = (function () {
 			return api.call(
 				'post', 'delivery', form
 			).then(function (res) {
-				$('#main-page .messages').append(
+				$(form).find('.messages').append(
 					view.alert('Delivery has been created', 'success')
 				);
 
@@ -256,6 +261,14 @@ var app = (function () {
 			}
 
 			this.receivedEvent('deviceready');
+
+			$(document).on('pageshow', '#main-page',
+				function (event) {
+					console.log(event, $('#sp-username'));
+					$('#sp-username')
+						.html(localStorage.username);
+				}
+			)
 
 			$(document).on('pagecreate', '#map-page',
 				function (event) {
