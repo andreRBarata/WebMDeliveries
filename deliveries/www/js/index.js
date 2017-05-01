@@ -26,12 +26,15 @@ var app = (function () {
 
 	var view = {
 		alert: function (message, type) {
-			return $('<div data-role="popup" class="alert alert-' +
-					(type || 'danger') + '">' +
-						'<a href="#" class="close" data-dismiss="alert">&times;</a>' +
-						message +
-					'</div>'
-				).alert();
+			return $.mobile.activePage.find('.messages')
+				.append(
+					$('<div data-role="popup" class="alert alert-' +
+						(type || 'danger') + '">' +
+							'<a href="#" class="close" data-dismiss="alert">&times;</a>' +
+							message +
+						'</div>'
+					).alert()
+				);
 		},
 		changepage: function (page, option) {
 			console.log('Change to page ' + page);
@@ -40,14 +43,16 @@ var app = (function () {
 				.pagecontainer('change', $(page), option);
 		},
 		modalinput: function (page, ele) {
+			var input = $(page)
+				.find('[role=inputreturn]');
+
 			view.changepage(page);
+			input.val($(ele).val());
 
 			return $(page).find('[role=inputsubmit]')
 				.one('click', function () {
-					var value = $(page)
-						.find('[role=inputreturn]')
-						.val();
-
+					var value = input.val();
+					console.log($(ele), ele);
 					$(ele).val(value);
 					$(page).dialog('close');
 				});
@@ -129,6 +134,19 @@ var app = (function () {
 					});
 			});
 		},
+		register: function (form) {
+			return api.call(
+				'post', 'user', form
+			).then(function(res) {
+				view.alert('Account created', 'success');
+
+				form.reset();
+			}).catch(function (err) {
+				view.alert(err ||
+					'Could not create account'
+				);
+			});
+		},
 		login: function (form) {
 
 			return api.call(
@@ -138,13 +156,10 @@ var app = (function () {
 				localStorage.setItem('username', form.username.value);
 
 				form.reset();
-			}).then(function () {
 				view.changepage('#main-page');
 			}).catch(function (err) {
-				$(form).find('.messages').append(
-					view.alert(err ||
-						'Could not login'
-					)
+				view.alert(err ||
+					'Could not login'
 				);
 			});
 		},
@@ -152,16 +167,12 @@ var app = (function () {
 			return api.call(
 				'post', 'delivery', form
 			).then(function (res) {
-				$(form).find('.messages').append(
-					view.alert('Delivery has been created', 'success')
-				);
+				view.alert('Delivery has been created', 'success');
 
 				form.reset();
 			}).catch(function (err) {
-				$('#main-page .messages').append(
-					view.alert(err ||
-						'Could not create delivery'
-					)
+				view.alert(err ||
+					'Could not create delivery'
 				);
 			});
 		},
@@ -291,9 +302,11 @@ var app = (function () {
 			);
 
 			$(document).on('pageshow',
-				function (event) {
+				function (event, data) {
 					if (!localStorage.token) {
-						view.changepage('#login-page');
+						if (!(data.attr('id') in ['login-page', 'register-page'])) {
+							view.changepage('#login-page');
+						}
 					}
 				}
 			);

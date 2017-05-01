@@ -16,16 +16,27 @@ from django.utils.decorators import method_decorator
 from models import User, Delivery
 
 # Create your views here.
+@api_view(["POST", ])
+@permission_classes((permissions.AllowAny, ))
 def user(request):
     if (not request.POST["username"]) or (not request.POST["password"]):
-        return Response({"detail": "Missing username and/or password"}, status=status.HTTP_400_BAD_REQUEST)
+        return JsonResponse({
+            "detail": "Missing username and/or password"
+        }, status=status.HTTP_400_BAD_REQUEST)
 
-        User.objects.create(
-            request.POST["username"],
-            request.POST["password"]
-        )
+    try:
+        User.objects.create_user(
+            username=request.POST["username"],
+            email=request.POST.get("email", ""),
+            password=request.POST["password"]
+        ).save()
 
-    return Response({"success": True})
+    except BaseException as e:
+        return JsonResponse({
+            "detail": e
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+    return JsonResponse({"success": True})
 
 def delivery(request):
     def post():
@@ -43,16 +54,14 @@ def delivery(request):
                 date = request.POST["date"]
             )
         except BaseException as e:
-            return e
+            return JsonResponse({
+                "detail": e
+            }, status=status.HTTP_400_BAD_REQUEST)
 
         return True
 
     def get():
-        return JsonResponse(
-            Delivery.objects.get(
-                by = request.user
-            )
-        )
+        return e
 
     if (request.method == 'GET'):
         return JsonResponse(get())
@@ -63,7 +72,7 @@ def delivery(request):
             return JsonResponse({
                 "success": False,
                 "detail": response
-            })
+            }, status=status.HTTP_400_BAD_REQUEST)
         else:
             return JsonResponse({"success": True})
     else:
@@ -97,4 +106,4 @@ def auth_login(request):
         else:
             return Response({"detail": "Inactive account"}, status=status.HTTP_400_BAD_REQUEST)
     else:
-        return Response({"detail": "Invalid User Id of Password"}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"detail": "Invalid User Id or Password"}, status=status.HTTP_400_BAD_REQUEST)

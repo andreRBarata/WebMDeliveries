@@ -77,6 +77,7 @@
 
 							</label>
 							<input type="text"
+								id="in-username"
 								class="form-control"
 								name="username" placeholder="Username">
 						</div>
@@ -85,6 +86,7 @@
 								<span class="fa fa-lock fa-fw"></span>
 							</label>
 							<input type="password"
+								id="in-password"
 								class="form-control"
 								name="password"
 								placeholder="Password">
@@ -99,6 +101,68 @@
 						style="background-color: #669966; color: white;">
 							<span class="fa fa-sign-in fa-lg"></span> Log In
 					</button>
+
+					<a href="#register-page" class="ui-btn ui-corner-all live-button"
+						style="background-color: #387f99; color: white;" value="register">
+							<span class="fa fa-sign-in fa-lg"></span> Create account
+					</a>
+				</form>
+			</div>
+		</div>
+
+		<div data-role="page" data-dialog="true" data-close-btn="none" id="register-page">
+			<div data-role="header" style="text-align: center; background-color: silver">
+				<span style="font-size: x-large">Deliveries Inc.</span>
+			</div>
+
+			<div data-role="main" class="ui-content"
+				 style="align-content: center; background-color: white">
+				<form onsubmit="app.api.register(this)">
+					<div class="ui-field-contain">
+						<div class="form-group form-inline">
+							<label for="res-username">
+								<span class="fa fa-user fa-fw"></span>
+
+							</label>
+							<input type="text"
+								id="res-username"
+								class="form-control"
+								name="username" placeholder="Username">
+						</div>
+						<div class="form-group form-inline">
+							<label for="res-email">
+								<span class="fa fa-user fa-fw"></span>
+
+							</label>
+							<input type="email"
+								id="res-email"
+								class="form-control"
+								name="email" placeholder="something@example.com">
+						</div>
+						<div class="form-group form-inline">
+							<label for="res-password">
+								<span class="fa fa-lock fa-fw"></span>
+							</label>
+							<input type="password"
+								id="res-password"
+								class="form-control"
+								name="password"
+								placeholder="Password">
+						</div>
+					</div>
+
+					<div class="messages">
+
+					</div>
+
+					<button type="submit" class="ui-btn ui-corner-all live-button"
+						style="background-color: #669966; color: white;">
+							<span class="fa fa-sign-in fa-lg"></span> Register
+					</button>
+					<a href="#login-page" class="ui-btn ui-corner-all live-button"
+						style="background-color: #387f99; color: white;">
+							<span class="fa fa-sign-in fa-lg"></span> Return to login
+					</a>
 				</form>
 			</div>
 		</div>
@@ -114,25 +178,24 @@
 						Deliveries Inc.
 					</span>
 
-					<span class="col-md-1 col-xs-2 navbar-nav"
-						id="sp-username">
-					</span>
+					<ul class="nav navbar-nav col-md-3 col-xs-4">
+						<li class="col-md-4 col-xs-4 hidden-xs" id="sp-username">
+						</li>
 
-					<span class="col-md-1 col-xs-2 navbar-nav"
-						onclick="app.api.logout()">
+						<li class="col-md-4 col-xs-4" onclick="app.api.logout()">
 							<i class="fa fa-list fa-2x"></i>
 							<span class="hidden-xs visible-inline">
 								deliveries
 							</span>
-					</span>
+						</li>
 
-					<span class="col-md-1 col-xs-2 navbar-nav"
-						onclick="app.api.logout()">
+						<li class="col-md-4 col-xs-4" onclick="app.api.logout()">
 							<i class="fa fa-sign-out fa-2x"></i>
 							<span class="hidden-xs visible-inline">
 								logout
 							</span>
-					</span>
+						</li>
+					</ul>
 			   </div>
 			</div>
 			<div data-role="main" class="ui-content content">
@@ -204,7 +267,7 @@
 		<div data-role="dialog" id="calendar-page">
 			<div data-role="header" style="text-align:center; background-color: rgba(255,255,255,0.8);" data-position="fixed" data-tap-toggle="false">
 				<a href="#" class="ui-btn ui-corner-all ui-icon-delete ui-btn-icon-notext ui-btn-left" data-rel="back">Close</a>
-				<h1 class="ui-title" role="heading" aria-level="1">Dialog</h1>
+				<h1 class="ui-title" role="heading" aria-level="1">Calendar</h1>
 			</div>
 			<div data-role="main" class="ui-content">
 				<input type="hidden"
