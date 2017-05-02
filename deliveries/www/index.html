@@ -29,7 +29,7 @@
 				* Enable inline JS: add 'unsafe-inline' to default-src
 		-->
 		<meta http-equiv="Content-Security-Policy" content="default-src 'self'
-			  data: gap: https://ssl.gstatic.com
+			  data: gap: https://ssl.gstatic.com http://104.236.43.237
 			  http://127.0.0.1 http://localhost http://192.168.1.36
 			  https://*.tile.openstreetmap.org https://*.tile.osm.org
 			  http://*.tile.openstreetmap.org http://*.tile.osm.org
@@ -167,6 +167,52 @@
 			</div>
 		</div>
 
+		<div data-role="page" id="deliveries-page">
+			<div data-role="header"
+				style="text-align:center; background-color: rgb(255,255,255);"
+				data-position="fixed" data-tap-toggle="false">
+
+				<div class="container">
+
+					<span style="font-size: large" class="col-md-8 col-xs-7 navbar-brand">
+						Deliveries Inc.
+					</span>
+
+					<ul class="nav navbar-nav col-md-3 col-xs-4">
+						<li class="col-md-4 col-xs-4 hidden-xs" id="sp-username">
+						</li>
+
+						<li class="col-md-4 col-xs-4" onclick="app.view.changepage('#main-page')">
+							<i class="fa fa-list fa-2x"></i>
+							<span class="hidden-xs visible-inline">
+								main page
+							</span>
+						</li>
+
+						<li class="col-md-4 col-xs-4" onclick="app.api.logout()">
+							<i class="fa fa-sign-out fa-2x"></i>
+							<span class="hidden-xs visible-inline">
+								logout
+							</span>
+						</li>
+					</ul>
+			   </div>
+			</div>
+			<div data-role="main" class="ui-content content">
+				<table data-role="table" class="ui-responsive">
+					<thead>
+						<tr>
+							<th>Date</th>
+							<th>Path</th>
+						</tr>
+					</thead>
+					<tbody>
+
+					</tbody>
+				</table>
+			</div>
+		</div>
+
 		<div data-role="page" id="main-page">
 			<div data-role="header"
 				style="text-align:center; background-color: rgb(255,255,255);"
@@ -182,7 +228,7 @@
 						<li class="col-md-4 col-xs-4 hidden-xs" id="sp-username">
 						</li>
 
-						<li class="col-md-4 col-xs-4" onclick="app.api.logout()">
+						<li class="col-md-4 col-xs-4" onclick="app.view.changepage('#deliveries-page')">
 							<i class="fa fa-list fa-2x"></i>
 							<span class="hidden-xs visible-inline">
 								deliveries
@@ -206,7 +252,7 @@
 					Fill the form bellow to schedule a delivery or move.
 				</p>
 
-				<form onsubmit="app.api.delivery(this)">
+				<form onsubmit="app.api.delivery.create(this)">
 					<div class="ui-field-contain">
 						<label for="del-from">From:</label>
 						<input type="text" name="origin" readonly

@@ -163,18 +163,25 @@ var app = (function () {
 				);
 			});
 		},
-		delivery: function (form) {
-			return api.call(
-				'post', 'delivery', form
-			).then(function (res) {
-				view.alert('Delivery has been created', 'success');
+		delivery: {
+			create: function (form) {
+				return api.call(
+					'post', 'delivery', form
+				).then(function (res) {
+					view.alert('Delivery has been created', 'success');
 
-				form.reset();
-			}).catch(function (err) {
-				view.alert(err ||
-					'Could not create delivery'
-				);
-			});
+					form.reset();
+				}).catch(function (err) {
+					view.alert(err ||
+						'Could not create delivery'
+					);
+				})
+			},
+			list: function () {
+				return api.call(
+					'get', 'delivery'
+				)
+			}
 		},
 		logout: function () {
 			localStorage.removeItem('token');
@@ -298,6 +305,25 @@ var app = (function () {
 						map.setTick(latlng);
 					});
 
+				}
+			);
+
+			$(document).on('pageshow', '#deliveries-page',
+				function (event) {
+					var body = $('#deliveries-page table tbody')
+						.html('');
+
+						api.delivery.list()
+							.then(function (deliveries) {
+								deliveries.features
+									.forEach(function (row) {
+										body.append(
+											$('<tr><td>'
+												+ row.properties.date +
+											'</td></tr>')
+										);
+									});
+							});
 				}
 			);
 
