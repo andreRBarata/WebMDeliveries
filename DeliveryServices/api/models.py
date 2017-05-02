@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # from django.db import models
 from django.utils import timezone
-from django.contrib.gis.geos import Point
+from django.contrib.gis.geos import Point, MultiPoint
 
 from django.contrib.gis.db import models
 from django.contrib.gis import geos
@@ -38,7 +38,7 @@ class Delivery(models.Model):
     driver = models.ForeignKey(
         'Driver',
         on_delete=models.CASCADE,
-		null=True
+        null=True
     )
     origin = models.PointField()
     destination = models.PointField()

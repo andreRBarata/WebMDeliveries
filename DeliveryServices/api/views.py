@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from django.shortcuts import render
 from django.contrib.gis.geos import Point
 
+from django.core.serializers import serialize
 from django.contrib.auth import authenticate, login, logout, get_user_model
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from rest_framework import permissions, authentication, status, generics
@@ -14,6 +15,7 @@ from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
 from django.utils.decorators import method_decorator
 
 from models import User, Delivery
+from serializers import DeliverySerializer
 
 # Create your views here.
 @api_view(["POST", ])
@@ -38,6 +40,7 @@ def user(request):
 
     return JsonResponse({"success": True})
 
+@api_view(["POST", "GET"])
 def delivery(request):
     def post():
         try:
@@ -54,18 +57,23 @@ def delivery(request):
                 date = request.POST["date"]
             )
         except BaseException as e:
-            return JsonResponse({
-                "detail": e
-            }, status=status.HTTP_400_BAD_REQUEST)
+            return e
 
         return True
 
     def get():
-        return e
+        return DeliverySerializer(
+            Delivery.objects.filter(
+                by = request.user
+            ),
+            many = True
+        )
 
-    if (request.method == 'GET'):
-        return JsonResponse(get())
-    elif (request.method == 'POST'):
+    if (request.method == "GET"):
+        return Response(get().data,
+            content_type="application/json"
+        )
+    elif (request.method == "POST"):
         response = post()
 
         if (response != True):
@@ -76,7 +84,9 @@ def delivery(request):
         else:
             return JsonResponse({"success": True})
     else:
-        return JsonResponse({"success": False})
+        return JsonResponse({
+            "success": False
+        }, status=status.HTTP_400_BAD_REQUEST)
 
 
 # @csrf_exempt

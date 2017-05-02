@@ -304,7 +304,7 @@ var app = (function () {
 			$(document).on('pageshow',
 				function (event, data) {
 					if (!localStorage.token) {
-						if (!(data.attr('id') in ['login-page', 'register-page'])) {
+						if (['login-page', 'register-page'].indexOf(data.prevPage.attr('id')) === -1) {
 							view.changepage('#login-page');
 						}
 					}
