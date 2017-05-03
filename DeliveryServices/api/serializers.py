@@ -1,5 +1,5 @@
 from models import User, Delivery
-from django.contrib.gis.geos import MultiPoint
+from django.contrib.gis.geos import LineString
 from rest_framework_gis import serializers as geo_serializers
 from rest_framework_gis.serializers import GeoFeatureModelSerializer, GeometrySerializerMethodField
 
@@ -7,7 +7,7 @@ from rest_framework_gis.serializers import GeoFeatureModelSerializer, GeometrySe
 class DeliverySerializer(geo_serializers.GeoFeatureModelSerializer):
     def get_path(self, obj):
         print obj
-        return MultiPoint(
+        return LineString(
             obj.destination,
             obj.origin
         )

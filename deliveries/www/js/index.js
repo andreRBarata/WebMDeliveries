@@ -22,8 +22,6 @@ var HOST = 'http://192.168.1.36';
 var app = (function () {
 	"use strict";
 
-	var mapElement;
-
 	var view = {
 		alert: function (message, type) {
 			return $.mobile.activePage.find('.messages')
@@ -65,8 +63,8 @@ var app = (function () {
 				.map(parseFloat);
 
 			return {
-				lat: coords[0],
-				lng: coords[1]
+				lat: coords[1],
+				lng: coords[0]
 			};
 		}
 	};
@@ -148,7 +146,6 @@ var app = (function () {
 			});
 		},
 		login: function (form) {
-
 			return api.call(
 				'post', 'login', form
 			).then(function(res) {
@@ -194,8 +191,8 @@ var app = (function () {
 		var point;
 
 		return {
-			makeBasicMap: function () {
-				mapElement = L.map('map-var', {
+			makeBasicMap: function (id) {
+				var mapElement = L.map(id, {
 					center: [53.350140, -6.266155],
     				zoom: 13
 				});
@@ -237,7 +234,7 @@ var app = (function () {
 						map.setTick(coords);
 					});
 			},
-			setTick(coords) {
+			setTick(coords, mapElement, inputElement) {
 				if (!point) {
 					point = L.marker(coords)
 						.addTo(mapElement);
@@ -246,8 +243,7 @@ var app = (function () {
 					point.setLatLng(coords);
 				}
 
-				$('#map-page')
-					.find('#map-coords')
+				$(inputElement)
 					.val(coords.lat + ', ' + coords.lng);
 			}
 		};
@@ -282,11 +278,42 @@ var app = (function () {
 
 			$(document).on('pageshow', '#main-page',
 				function (event) {
-					console.log(event, $('#sp-username'));
 					$('#sp-username')
 						.html(localStorage.username);
 				}
-			)
+			);
+
+			var deliveryFunc = (function () {
+				var mapElement;
+				var lastLayer;
+
+				return function (event) {
+					console.log('In pagecreate. Target is ' + event.target.id + '.');
+
+					$('#deliveries-page').enhanceWithin();
+
+					if (!mapElement) {
+						mapElement = map.makeBasicMap('delivery-var');
+					}
+
+					api.delivery.list()
+						.then(function (deliveries) {
+							if (lastLayer) {
+								mapElement
+									.removeLayer(lastLayer);
+							}
+
+							lastLayer = L.geoJSON(deliveries.features);
+
+							lastLayer
+								.addTo(mapElement);
+						});
+				}
+			})();
+
+			$(document).on('pageshow', '#deliveries-page',
+				deliveryFunc
+			);
 
 			$(document).on('pagecreate', '#map-page',
 				function (event) {
@@ -294,7 +321,7 @@ var app = (function () {
 
 					$('#map-page').enhanceWithin();
 
-					mapElement = map.makeBasicMap();
+					var mapElement = map.makeBasicMap('map-var');
 
 					mapElement.invalidateSize();
 					mapElement.on('click', function (ev) {
@@ -302,28 +329,11 @@ var app = (function () {
 						var latlng = mapElement
 							.mouseEventToLatLng(ev.originalEvent);
 
-						map.setTick(latlng);
+						map.setTick(latlng, mapElement,
+							$('#map-page').find('[role=inputreturn]')
+						);
 					});
 
-				}
-			);
-
-			$(document).on('pageshow', '#deliveries-page',
-				function (event) {
-					var body = $('#deliveries-page table tbody')
-						.html('');
-
-						api.delivery.list()
-							.then(function (deliveries) {
-								deliveries.features
-									.forEach(function (row) {
-										body.append(
-											$('<tr><td>'
-												+ row.properties.date +
-											'</td></tr>')
-										);
-									});
-							});
 				}
 			);
 
